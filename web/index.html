@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hornets Tactics Board</title>
+<meta name="theme-color" content="#0f3d22">
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="badge" aria-hidden="true"><svg viewBox="0 0 40 44" width="38" height="42"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe566"/><stop offset="1" stop-color="#f5c518"/></linearGradient></defs><path d="M20 2 L37 8 V22 C37 33 29 39 20 42 C11 39 3 33 3 22 V8 Z" fill="url(#g)" stroke="#0f3d22" stroke-width="2.5"/><path d="M8 14 H32 M6.5 21 H33.5 M8 28 H32" stroke="#0f3d22" stroke-width="4"/><circle cx="20" cy="21" r="5.5" fill="#1f8a3b" stroke="#0f3d22" stroke-width="2"/></svg></span>
+    <div>
+      <h1>Hornets Tactics Board</h1>
+      <p class="sub">Green &amp; gold practice board · formations, drills &amp; coach notes</p>
+    </div>
+  </div>
+  <div class="topmeta">
+    <span class="pill">12U · youth soccer</span>
+    <span class="pill soft">offline · private</span>
+    <button id="btnHelp" class="ghost" title="How to use">❓ Help</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="boardcol">
+    <div class="toolbar" id="toolbar" role="toolbar" aria-label="Tools">
+      <button data-tool="move" class="tool on" title="Move players and ball (M)">✋<span>Move</span></button>
+      <button data-tool="pass" class="tool" title="Pass arrow, solid (P)"><i class="ico pass"></i><span>Pass</span></button>
+      <button data-tool="run" class="tool" title="Run arrow, dashed (R)"><i class="ico run"></i><span>Run</span></button>
+      <button data-tool="dribble" class="tool" title="Dribble arrow, wavy (D)"><i class="ico dribble"></i><span>Dribble</span></button>
+      <button data-tool="erase" class="tool" title="Eraser: tap or swipe over arrows (E)">🧽<span>Erase</span></button>
+      <span class="sep"></span>
+      <button id="btnUndo" class="act" title="Undo (Ctrl+Z)">↶<span>Undo</span></button>
+      <button id="btnClearArrows" class="act" title="Remove arrows on this frame">✖<span>Clear arrows</span></button>
+      <button id="btnReset" class="act" title="Put players back in formation">⟲<span>Reset</span></button>
+    </div>
+    <div class="legend" aria-label="Arrow legend">
+      <span><i class="lg pass"></i> Pass</span>
+      <span><i class="lg run"></i> Run</span>
+      <span><i class="lg dribble"></i> Dribble</span>
+      <span class="lg-hint">Drag from a player to snap the start</span>
+    </div>
+    <div class="pitchwrap" id="pitchwrap">
+      <canvas id="pitch" aria-label="Soccer pitch tactics board"></canvas>
+      <div class="playtitle" id="playTitle"></div>
+      <div class="pitchbadge" aria-hidden="true">HORNETS</div>
+    </div>
+    <div class="timeline" id="timeline">
+      <div class="transport">
+        <button id="btnFirst" title="First frame">⏮</button>
+        <button id="btnPrev" title="Step back">◀</button>
+        <button id="btnPlay" class="big" title="Play / pause (Space)">▶</button>
+        <button id="btnNext" title="Step forward">▶|</button>
+        <label class="speed" title="Playback speed">Speed
+          <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select>
+        </label>
+      </div>
+      <div class="frames">
+        <div id="frameChips" class="chips"></div>
+        <button id="btnAddFrame" class="add" title="Copy this frame to a new step">＋ Frame</button>
+        <button id="btnDelFrame" class="del" title="Delete this frame">🗑</button>
+      </div>
+      <div class="hint" id="frameHint">Frame 1 of 1. Arrange players, then tap ＋ Frame and move them again to build a play.</div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="card hero">
+      <h2>Team setup</h2>
+      <div class="seg" id="formatSeg" role="radiogroup" aria-label="Format">
+        <button data-format="7">7v7</button><button data-format="9">9v9</button><button data-format="11">11v11</button>
+      </div>
+      <p class="note">Pick the format your game uses. The board does not assume any league rule — use whatever matches the field you are on.</p>
+      <div class="row2">
+        <label>Hornets <select id="homeForm"></select></label>
+        <label>Away <select id="awayForm"></select></label>
+      </div>
+      <div class="formviz" id="formViz" aria-label="Formation preview"></div>
+      <div class="checks">
+        <label><input type="checkbox" id="chkAway" checked> Show away team</label>
+        <label><input type="checkbox" id="chkRoles"> Show positions (not numbers)</label>
+        <label><input type="checkbox" id="chkGhost" checked> Ghost of last frame</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Drills &amp; plays <span class="tag">generic examples</span></h2>
+      <p class="note">Generic teaching examples. Not from any real team or league. Load one, then press ▶.</p>
+      <div id="presetList" class="presets"></div>
+    </div>
+
+    <div class="card notes-card">
+      <h2>Practice notes <span class="tag soft">coach crib</span></h2>
+      <p class="note">Kid-friendly reminders parents and coaches can read aloud. No schedule — just ideas for the pitch.</p>
+      <div id="practiceNotes" class="practice-notes"></div>
+    </div>
+
+    <div class="card">
+      <h2>My plays</h2>
+      <div class="saverow">
+        <input id="playName" type="text" maxlength="40" placeholder="Name this play">
+        <button id="btnSave" class="primary">💾 Save</button>
+      </div>
+      <div id="savedList" class="saved"></div>
+      <label class="notes">Coach notes <textarea id="notes" rows="3" placeholder="What should each player look for?"></textarea></label>
+      <div class="exports">
+        <button id="btnExportJson">⬇ Export JSON</button>
+        <button id="btnImportJson">⬆ Import JSON</button>
+        <button id="btnExportPng">🖼 Save PNG</button>
+        <button id="btnNew">✨ New board</button>
+        <input id="fileImport" type="file" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>Hornets Tactics · TokenMax remaster Sat Oct 10 afternoon</span>
+  <span>Everything stays on this device · localhost port 4280</span>
+</footer>
+
+<div id="help" class="modal" hidden>
+  <div class="modalbox">
+    <h2>How to use the board</h2>
+    <ol>
+      <li><b>Pick a format</b> (7v7, 9v9 or 11v11) and a formation for each team.</li>
+      <li><b>✋ Move:</b> drag any player or the ball with a finger or the mouse.</li>
+      <li><b>Pass</b> draws a solid arrow, <b>Run</b> a dashed arrow, <b>Dribble</b> a wavy one. Drag on the pitch to draw.</li>
+      <li><b>🧽 Erase:</b> tap or swipe across an arrow to remove it. <b>↶ Undo</b> takes back the last change.</li>
+      <li><b>Build a play:</b> set up frame 1, tap <b>＋ Frame</b>, move players to where they go next and repeat. Press <b>▶</b> to watch it.</li>
+      <li><b>Practice notes</b> are generic coach tips. Read them with your player — they are not a practice schedule.</li>
+      <li><b>Save</b> named plays on this device, export JSON to share, or save a PNG picture of the board.</li>
+    </ol>
+    <p class="note">Keys: Space play/pause · ←/→ step · Ctrl+Z undo · M/P/R/D/E tools.<br>Everything stays on this device. No account and no internet needed.</p>
+    <button id="btnHelpClose" class="primary">Got it</button>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>/*__APP__*/</script>
+</body>
+</html>
