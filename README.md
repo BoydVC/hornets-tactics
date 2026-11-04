@@ -1,6 +1,6 @@
 # Hornets Tactics Board ⚽
 
-**A pocket tactics and drill board for Vic's Green Hornets soccer** (12U branding only — no invented schedule or roster). Drag green-and-gold Hornets and blue away players around a striped, properly marked pitch. Draw solid pass arrows, dashed run arrows and wavy dribble arrows, then build a play frame by frame and press ▶ to watch everyone glide into place. Kid-friendly for players, parent-readable for coaches at home. One offline HTML file — no account, no network, no ads.
+**A pocket tactics and drill board for Sam's Blue Comets soccer** (12U branding only — no invented schedule or roster). Drag green-and-gold Hornets and blue away players around a striped, properly marked pitch. Draw solid pass arrows, dashed run arrows and wavy dribble arrows, then build a play frame by frame and press ▶ to watch everyone glide into place. Kid-friendly for players, parent-readable for coaches at home. One offline HTML file — no account, no network, no ads.
 
 * **Open it:** double-click `dist/hornets-tactics.html` (works from file://, a USB stick or AirDrop), or run `./run.sh` and go to http://127.0.0.1:4280/
 * **Best screenshot:** `screenshots/00-best-home.png`
